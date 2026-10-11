@@ -39,15 +39,15 @@
     --bg-tint:rgba(239,230,218,.78);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden;overflow-x:clip;max-width:100%}
   body{
     font-family:'Tajawal',sans-serif;
     background:#e3d4c3;
     color:var(--ink);
-    overflow-x:hidden;
+    overflow-x:hidden;overflow-x:clip;max-width:100%;
     line-height:1.8;
   }
-  body.locked{overflow:hidden;height:100vh}
+  body.locked{overflow:hidden;height:100vh;height:100svh}
   /* the page behind the envelope is only laid out once the seal is tapped */
   body.pre .hero,body.pre main,body.pre .nav{display:none}
   /* nothing behind the closed envelope needs to move yet: hold its looping animations until it opens */
@@ -63,7 +63,7 @@
     display:flex;align-items:center;justify-content:center;
     background:#a48f78;
     /* the final dissolve: a long, calm fade through a soft warm brightening */
-    transition:opacity .6s ease, transform .7s cubic-bezier(.2,.9,.2,1), filter .5s ease, visibility 0s .7s;
+    transition:opacity 1s ease, transform 1.1s cubic-bezier(.2,.9,.2,1), filter .8s ease, visibility 0s 1.1s;
   }
   /* the satin cloth from the envelope photo (envelopes removed, the dried sprig kept in the top corner) */
   #intro::before{
@@ -142,7 +142,10 @@
   /* phones (portrait): the tall envelope fills the whole screen, like the other designs; body and flap
      stretch together to the screen's shape so they stay aligned, and the seal keeps its round shape */
   @media (max-aspect-ratio: 3/4){
-    .envelope{width:100vw;height:100vh;height:100svh;aspect-ratio:auto;flex-shrink:0}
+    /* fill #intro itself (not 100vw/100svh, which can differ from the fixed box on mobile browsers
+       and leave a strip of the satin showing at the edges) */
+    .env-stage{position:absolute;inset:0;display:block}
+    .envelope{width:100%;height:100%;aspect-ratio:auto;flex-shrink:0}
     .env-body{border-radius:0;box-shadow:none}
     .seal{left:50%;top:46.96%;width:30%}
     .guest{position:absolute;left:0;right:0;bottom:17%;z-index:7;text-align:center;margin:0;color:#6b5236;text-shadow:none}
@@ -266,6 +269,17 @@
   }
   #intro.s3 .flood{opacity:1}
   #intro.s3 .envelope>picture,#intro.s3 .env-flap,#intro.s3 .env-shade,#intro.s3 .env-shaft,#intro.s3 .env-sprig{opacity:0;transition:opacity 1s ease}
+  /* the body photo has the closed flap printed on it, so once the real flap lifts the envelope would still
+     look shut: this layer, cut to the flap's exact shape (the flap image is its mask), turns that area into
+     the shaded inside of the open envelope, deepest just above the pocket's edge */
+  .env-inside{
+    position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+    background:radial-gradient(ellipse 75% 62% at 50% 0,rgba(52,36,22,.12) 0%,rgba(52,36,22,.3) 50%,rgba(52,36,22,.58) 92%);
+    -webkit-mask:url("assets/envelope-beige-flap.webp") 0 0/100% 100% no-repeat;mask:url("assets/envelope-beige-flap.webp") 0 0/100% 100% no-repeat;
+  }
+  @media (max-aspect-ratio: 3/4){.env-inside{-webkit-mask-image:url("assets/envelope-beige-flap-m.webp");mask-image:url("assets/envelope-beige-flap-m.webp")}}
+  #intro.s2 .env-inside{opacity:1;transition:opacity 1.4s ease .2s}
+  #intro.s3 .env-inside{opacity:0;transition:opacity .5s ease}
   /* the warm diagonal beam that slides in across the paper (over everything, like light in the room) */
   .env-shaft{
     position:absolute;inset:-12%;z-index:8;pointer-events:none;opacity:0;mix-blend-mode:screen;filter:blur(10px);
@@ -285,6 +299,11 @@
     #intro.s2 .env-shade{animation:none}
     /* the room dims more, so the light inside stands out the way it does in the film */
     #intro.s1 .env-body{filter:brightness(.72) saturate(.94)}
+    /* the light layers are already soft gradients, so phones skip their live blur (blurring and blending
+       full-screen layers every frame is what made the opening stutter); the moving layers get their own
+       GPU layer as soon as the seal is tapped */
+    .env-light,.env-bloom,.env-shaft{filter:none}
+    #intro.s1 .envelope,#intro.s1 .env-flap{will-change:transform}
     .env-light{background:radial-gradient(ellipse 60% 34% at 50% 12%,rgba(255,244,222,.85) 0%,rgba(255,232,204,.45) 40%,rgba(255,226,196,.12) 65%,transparent 80%)}
     .env-bloom{left:50%;width:150%;top:45%}
   }
@@ -375,7 +394,8 @@
   @keyframes bloom{from{opacity:0;scale:.75;filter:blur(4px) drop-shadow(0 8px 14px rgba(122,90,48,.18))}to{opacity:1;scale:1}}
 
   /* ================= SECTIONS ================= */
-  main{padding:0 6px 120px}
+  /* clip sideways only: the corner sprigs may still rise above each card, but never widen the page */
+  main{padding:0 6px 120px;overflow-x:clip}
   section{padding:44px 0;text-align:center;position:relative;isolation:isolate}
   /* no hard bands: every section sits on the same fixed backdrop, with a soft white glow behind each one */
   section::before{
@@ -571,6 +591,7 @@
     position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
     background:rgba(74,58,42,.9);color:#fff;padding:9px 18px;border-radius:999px;font-size:14px;
     opacity:0;transition:.35s;z-index:60;pointer-events:none;white-space:nowrap;
+    max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;
   }
   .toast.show{opacity:1;transform:translateX(-50%)}
 
@@ -604,7 +625,7 @@
         <source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-body-m.webp">
         <img class="env-body" src="assets/envelope-beige-body.webp" alt="" width="1200" height="642" fetchpriority="high">
       </picture>
-      <i class="env-shade" aria-hidden="true"></i>
+      <i class="env-inside" aria-hidden="true"></i><i class="env-shade" aria-hidden="true"></i>
       <!-- light inside the envelope, revealed as the flap lifts -->
       <i class="env-light" aria-hidden="true"></i>
       <i class="env-bloom" aria-hidden="true"></i><i class="env-shaft" aria-hidden="true"></i>
@@ -1005,8 +1026,8 @@ $("#openBtn").addEventListener("click", () => {
   if (navigator.vibrate) navigator.vibrate(30);
   const steps = reduce ? [[0, "s1 s2"]] : [
     [0, "s1"],          // seal pressed, the room dims, a warm beam slides in, light leaks from under the flap
-    [600, "s2"],        // the camera pushes in while the flap swings open, revealing the lit inside
-    [2000, "s3"],       // the rest of the envelope melts away: only the light is left
+    [900, "s2"],        // the camera pushes in while the flap swings open, revealing the lit inside
+    [3500, "s3"],       // the rest of the envelope melts away: only the light is left
   ];
   steps.forEach(([t, c]) => setTimeout(() => intro.classList.add(...c.split(" ")), t));
   setTimeout(() => {                                // then the whole scene dissolves into the page
@@ -1015,7 +1036,7 @@ $("#openBtn").addEventListener("click", () => {
     document.body.classList.remove("locked");
     document.querySelectorAll(".reveal").forEach(el => io.observe(el));
     $("#map").src = mapSrc;
-  }, reduce ? 300 : 2600);                          // the light holds a moment, then fades into the page
+  }, reduce ? 300 : 4100);                          // the light holds a moment, then fades into the page
 });
 function playMusic() {
   if (!CONFIG.music) return;
