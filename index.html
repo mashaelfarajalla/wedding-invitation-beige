@@ -237,6 +237,8 @@
     100%{transform:translateY(-75%) rotateX(68deg)}
   }
   @keyframes flapDim{from{filter:brightness(.84)}to{filter:brightness(.7)}}
+  @keyframes flapDimSoft{from{filter:brightness(.94)}to{filter:brightness(.84)}}
+  .env-pocket{display:none}
 
   /* ---- the light from inside: soft and round, no hard shapes — the envelope's own inside shows through ---- */
   /* under the flap: a warm glow that lights up the inside of the envelope as the flap lifts */
@@ -305,7 +307,15 @@
     #intro.s2 .envelope{transform:scale(1.1);transition:transform 4.2s cubic-bezier(.3,.1,.3,1)}
     #intro.s2 .env-shade{animation:none}
     /* the room dims more, so the light inside stands out the way it does in the film */
-    #intro.s1 .env-body{filter:brightness(.72) saturate(.94)}
+    #intro.s1 .env-body{filter:brightness(.9)}
+    /* only a light dimming on phones, so each envelope keeps its real colour while it opens */
+    #intro.s1 .env-flap>picture>img{filter:brightness(.94)}
+    #intro.s2 .env-flap>picture>img,#intro.s2 .seal img{animation:flapDimSoft 3.3s ease-in both}
+    /* the envelope's straight front edge: the open triangle's tip tucks in behind it */
+    .env-pocket{display:block;position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:0}
+    #intro.s1 .env-pocket{filter:brightness(.9);transition:filter 2.4s ease}
+    #intro.s2 .env-pocket{opacity:1;transition:filter 2.4s ease,opacity 1.4s ease .2s}
+    #intro.s3 .env-pocket{opacity:0;transition:opacity .5s ease}
     /* the light layers are already soft gradients, so phones skip their live blur (blurring and blending
        full-screen layers every frame is what made the opening stutter); the moving layers get their own
        GPU layer as soon as the seal is tapped */
@@ -636,7 +646,8 @@
         <source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-body-m.webp">
         <img class="env-body" src="assets/envelope-beige-body.webp" alt="" width="1200" height="642" fetchpriority="high">
       </picture>
-      <i class="env-inside" aria-hidden="true"></i><i class="env-shade" aria-hidden="true"></i>
+      <i class="env-inside" aria-hidden="true"></i>
+      <picture><source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-pocket-m.webp"><img class="env-pocket" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt=""></picture><i class="env-shade" aria-hidden="true"></i>
       <!-- light inside the envelope, revealed as the flap lifts -->
       <i class="env-light" aria-hidden="true"></i>
       <i class="env-bloom" aria-hidden="true"></i><i class="env-shaft" aria-hidden="true"></i>
