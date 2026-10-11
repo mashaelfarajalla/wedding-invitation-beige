@@ -272,7 +272,7 @@
     transition:opacity .7s ease;
   }
   #intro.s3 .flood{opacity:1}
-  #intro.s3 .envelope>picture,#intro.s3 .env-flap,#intro.s3 .env-shade,#intro.s3 .env-shaft,#intro.s3 .env-sprig{opacity:0;transition:opacity 1s ease}
+  #intro.s3 .env-paper,#intro.s3 .env-flap,#intro.s3 .env-shade,#intro.s3 .env-shaft,#intro.s3 .env-sprig{opacity:0;transition:opacity 1s ease}
   /* the body photo has the closed flap printed on it, so once the real flap lifts the envelope would still
      look shut: this layer, cut to the flap's exact shape (the flap image is its mask), turns that area into
      the shaded inside of the open envelope, deepest just above the pocket's edge */
@@ -288,7 +288,6 @@
   }
   @media (max-aspect-ratio: 3/4){.env-inside{-webkit-mask-image:url("assets/envelope-beige-flap-m.webp");mask-image:url("assets/envelope-beige-flap-m.webp")}}
   #intro.s2 .env-inside{opacity:1;transition:opacity 1.4s ease .2s}
-  #intro.s3 .env-inside{opacity:0;transition:opacity .5s ease}
   /* the warm diagonal beam that slides in across the paper (over everything, like light in the room) */
   .env-shaft{
     position:absolute;inset:-12%;z-index:8;pointer-events:none;opacity:0;mix-blend-mode:screen;filter:blur(10px);
@@ -314,8 +313,7 @@
     /* the envelope's straight front edge: the open triangle's tip tucks in behind it */
     .env-pocket{display:block;position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:0}
     #intro.s1 .env-pocket{filter:brightness(.9);transition:filter 2.4s ease}
-    #intro.s2 .env-pocket{opacity:1;transition:filter 2.4s ease,opacity 1.4s ease .2s}
-    #intro.s3 .env-pocket{opacity:0;transition:opacity .5s ease}
+    #intro.s2 .env-pocket{opacity:1;transition:filter 2.4s ease,opacity .5s ease}
     /* the light layers are already soft gradients, so phones skip their live blur (blurring and blending
        full-screen layers every frame is what made the opening stutter); the moving layers get their own
        GPU layer as soon as the seal is tapped */
@@ -642,12 +640,16 @@
   <div class="env-stage">
     <div class="envelope">
       <!-- beige linen envelope + gold wax seal (cut from assets/images, same layout on every screen) -->
+      <!-- the envelope's paper: body photo + its open inside + straight front edge, faded out as one piece -->
+      <div class="env-paper">
       <picture>
         <source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-body-m.webp">
         <img class="env-body" src="assets/envelope-beige-body.webp" alt="" width="1200" height="642" fetchpriority="high">
       </picture>
-      <i class="env-inside" aria-hidden="true"></i>
-      <picture><source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-pocket-m.webp"><img class="env-pocket" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt=""></picture><i class="env-shade" aria-hidden="true"></i>
+        <i class="env-inside" aria-hidden="true"></i>
+        <picture><source media="(max-aspect-ratio: 3/4)" srcset="assets/envelope-beige-pocket-m.webp"><img class="env-pocket" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt=""></picture>
+      </div>
+      <i class="env-shade" aria-hidden="true"></i>
       <!-- light inside the envelope, revealed as the flap lifts -->
       <i class="env-light" aria-hidden="true"></i>
       <i class="env-bloom" aria-hidden="true"></i><i class="env-shaft" aria-hidden="true"></i>
