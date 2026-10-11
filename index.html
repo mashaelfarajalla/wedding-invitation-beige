@@ -243,7 +243,7 @@
     background:radial-gradient(ellipse 50% 50% at 50% 22%,rgba(255,244,222,.85) 0%,rgba(255,232,204,.45) 40%,rgba(255,226,196,.12) 65%,transparent 80%);
   }
   #intro.s2 .env-light{animation:lightIn 3s ease-out .3s forwards}
-  @keyframes lightIn{0%{opacity:0}60%,100%{opacity:1}}
+  @keyframes lightIn{0%{opacity:0}60%,100%{opacity:var(--light,1)}}
   /* over everything: a soft halo that first glows faintly from behind the seal, as if the light is
      inside the envelope, then swells and drifts up as the flap opens */
   .env-bloom{
@@ -256,7 +256,7 @@
   @keyframes bloomUp{
     0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
     20%{opacity:.55;transform:translate(-50%,-50%) scale(.45)}
-    100%{opacity:.8;top:22%;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:var(--bloom,.8);top:22%;transform:translate(-50%,-50%) scale(1)}
   }
   /* s3: once the flap is up, the rest of the envelope melts away and only the light is left on screen,
      which then dissolves into the page */
@@ -274,7 +274,12 @@
      the shaded inside of the open envelope, deepest just above the pocket's edge */
   .env-inside{
     position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
-    background:radial-gradient(ellipse 75% 62% at 50% 0,rgba(52,36,22,.12) 0%,rgba(52,36,22,.3) 50%,rgba(52,36,22,.58) 92%);
+    /* neutral grey shading blended with multiply: it only darkens, so the inside keeps the envelope's own
+       paper colour and texture exactly — a soft crease under the hinge, deepening towards the pocket's edges */
+    background:
+      linear-gradient(180deg,rgb(214,214,214) 0%,rgb(242,242,242) 5%,#fff 11%),
+      radial-gradient(ellipse 75% 62% at 50% 0,#fff 0%,rgb(240,240,240) 45%,rgb(212,212,212) 92%);
+    background-blend-mode:multiply;mix-blend-mode:multiply;
     -webkit-mask:url("assets/envelope-beige-flap.webp") 0 0/100% 100% no-repeat;mask:url("assets/envelope-beige-flap.webp") 0 0/100% 100% no-repeat;
   }
   @media (max-aspect-ratio: 3/4){.env-inside{-webkit-mask-image:url("assets/envelope-beige-flap-m.webp");mask-image:url("assets/envelope-beige-flap-m.webp")}}
@@ -303,6 +308,8 @@
        full-screen layers every frame is what made the opening stutter); the moving layers get their own
        GPU layer as soon as the seal is tapped */
     .env-light,.env-bloom,.env-shaft{filter:none}
+    /* and a softer light, so it doesn't wash the open inside out to white: it stays the envelope's colour */
+    .env-light{--light:.55}.env-bloom{--bloom:.45}
     #intro.s1 .envelope,#intro.s1 .env-flap{will-change:transform}
     .env-light{background:radial-gradient(ellipse 60% 34% at 50% 12%,rgba(255,244,222,.85) 0%,rgba(255,232,204,.45) 40%,rgba(255,226,196,.12) 65%,transparent 80%)}
     .env-bloom{left:50%;width:150%;top:45%}
