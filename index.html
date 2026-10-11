@@ -74,6 +74,8 @@
   @media (min-width:1024px) and (min-aspect-ratio:4/3){
     #intro::before{background-image:url("assets/satin-bg-web.webp");background-position:center}
   }
+  /* phones: the envelope covers the whole screen, so the satin behind it is never seen — don't download it */
+  @media (max-aspect-ratio: 3/4){#intro::before{background:none}}
   #intro::after{ /* only a light vignette at the far edges: the satin itself stays clear everywhere */
     content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
     background:radial-gradient(ellipse 130% 100% at 50% 50%,transparent 60%,rgba(52,36,22,.22));
@@ -330,6 +332,8 @@
       radial-gradient(ellipse 120% 90% at 50% 50%,transparent 50%,rgba(70,50,28,.2));
   }
   .page-bg .leaf{display:none}
+  /* the paper sits hidden under the envelope at first: fetched once the envelope is up (or on tap) */
+  body.pre:not(.warm) .page-bg{background-image:none}
 
   .hero{position:relative;height:100svh;min-height:620px;overflow:hidden}
   /* dried stems in two opposite corners, their cut ends tucked into the corner (cut end = 46% 94% of the image) */
@@ -1020,7 +1024,7 @@ let opening = false;
 const unhide = () => document.body.classList.remove("pre");
 /* the page behind the envelope is laid out only when the seal is tapped (keeps the first load light);
    its fonts are fetched in the background shortly after the envelope is up, so nothing flashes when it opens */
-const warmFonts = () => document.fonts && Promise.all(
+const warmFonts = () => document.body.classList.add("warm") || document.fonts && Promise.all(
   ["400 1em Amiri", "400 1em 'Aref Ruqaa'", "700 1em 'Aref Ruqaa'", "300 1em Tajawal", "400 1em Tajawal",
    "500 1em Tajawal", "700 1em Tajawal", "800 1em Tajawal", "600 1em Caveat"]
   .map(font => document.fonts.load(font, "ابجد 0123 abc"))).catch(() => {});
